@@ -8,6 +8,7 @@ const createError = require('http-errors')
 const connectMongoDB = require("./config/db");
 const userRouter = require("./routes/userRouter");
 const seedRouter = require("./routes/seedRoute");
+const { errorResponse } = require("./controller/responseController");
 
 // application init
 const app = express()
@@ -47,8 +48,8 @@ app.use((req,res,next) => {
 
 // server error handling 
 app.use((err,req,res,next) => {
-    res.status(err.status || 500).json({
-        success: false,
+    errorResponse(res, {
+        statusCode: err.status,
         message: err.message
     })
 })
