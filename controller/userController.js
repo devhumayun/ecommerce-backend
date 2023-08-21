@@ -1,11 +1,15 @@
 const createError = require("http-errors");
 const User = require("../models/User");
 const { successResponse } = require("./responseController");
+const mongoose = require("mongoose");
 
 /**
- * get all user
+ * Get
+ * api/v1/users
+ * public
+ * Get all users with Search result and Pagination
  */
-const allUser = async (req, res, next) => {
+const allUsers = async (req, res, next) => {
   try {
     // search query init
     const search = req.query.search || "";
@@ -56,5 +60,41 @@ const allUser = async (req, res, next) => {
   }
 };
 
+
+/**
+ * Get
+ * api/v1/users/:id
+ * public
+ * Get Single user
+ */
+const getUser = async (req, res, next ) => {
+  try {
+
+    // get user id
+    const id = req.params.id
+    // hide password
+    const option = {password : 0}
+    // get user
+    const user = await User.findById(id, option)
+    // create and error
+    if (!user) throw createError(404, "User not exists in this id");
+
+    // response from responseController
+    return successResponse(res, {
+      ststus: 200,
+      message: "User get Successfull", 
+      payload: {user}
+    })
+
+  } catch (error) {
+    if(error instanceof mongoose.Error){
+      next(createError(400, "Invalid user id"))
+      return
+    }
+    next(error)
+  }
+}
+
+
 // exports
-module.exports = { allUser };
+module.exports = { allUsers, getUser };
