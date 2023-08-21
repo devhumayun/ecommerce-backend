@@ -74,7 +74,7 @@ const getUser = async (req, res, next) => {
     const id = req.params.id;
     // hide password
     const option = { password: 0 };
-    const user = await findItemById(id, option);
+    const user = await findItemById(User, id, option);
     // response from responseController
     return successResponse(res, {
       ststus: 200,
@@ -98,7 +98,7 @@ const deleteUser = async (req, res, next) => {
     const id = req.params.id;
     // hide password
     const option = { password: 0 };
-    const user = await findItemById(id, option);
+    const user = await findItemById(User,id, option);
     
     // delete user image
     // const userImagePath = user?.image

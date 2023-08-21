@@ -1,17 +1,16 @@
 const mongoose = require("mongoose");
 const createError = require("http-errors");
-const User = require("../models/User");
 
 /**
  * This function for getting item by id
  */
 
-const findItemById = async (id, option) => {
+const findItemById = async (Model, id, option) => {
   try {
     // get item
-    const item = await User.findById(id, option);
+    const item = await Model.findById(id, option);
     // create and error
-    if (!item) throw createError(404, "item not exists in this id");
+    if (!item) throw createError(404, `${Model.modelName} item not exists in this id`);
 
     return item;
   } catch (error) {
