@@ -1,8 +1,9 @@
 const createError = require("http-errors");
+const fs = require("fs")
 const User = require("../models/User");
 const { successResponse } = require("./responseController");
 const mongoose = require("mongoose");
-const { findUserById } = require("../services/findUser");
+const { findItemById } = require("../services/findItem");
 
 /**
  * Get
@@ -71,12 +72,35 @@ const getUser = async (req, res, next) => {
   try {
     // get user id
     const id = req.params.id;
-    const user = await findUserById(id);
+    // hide password
+    const option = { password: 0 };
+    const user = await findItemById(id, option);
     // response from responseController
     return successResponse(res, {
       ststus: 200,
       message: "User get Successfull",
       payload: { user },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const deleteUser = async (req, res, next) => {
+  try {
+    // get user id
+    const id = req.params.id;
+    // hide password
+    const option = { password: 0 };
+    const user = await findItemById(id, option);
+
+    const userImagePath = user.image
+    fs.access(userImagePath, )
+
+    // response from responseController
+    return successResponse(res, {
+      ststus: 200,
+      message: "User deleted Successfull",
     });
   } catch (error) {
     next(error);
