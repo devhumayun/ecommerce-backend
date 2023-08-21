@@ -16,7 +16,7 @@ const allUsers = async (req, res, next) => {
     // search query init
     const search = req.query.search || "";
     const page = Number(req.query.page || 1);
-    const limit = Number(req.query.limit || 2);
+    const limit = Number(req.query.limit || 10);
 
     // search RegEx
     const searchRegEx = new RegExp(".*" + search + ".*", "i");
@@ -86,6 +86,12 @@ const getUser = async (req, res, next) => {
   }
 };
 
+/**
+ * delete
+ * api/v1/users/:id
+ * admin
+ * Delete user without admin
+ */
 const deleteUser = async (req, res, next) => {
   try {
     // get user id
@@ -93,19 +99,36 @@ const deleteUser = async (req, res, next) => {
     // hide password
     const option = { password: 0 };
     const user = await findItemById(id, option);
+    
+    // delete user image
+    // const userImagePath = user?.image
+    // fs.access(userImagePath, (err) => {
+    //   if(err){
+    //     console.log("user Image not exists");
+    //   }else {
+    //     fs.unlink(userImagePath, (err) =>{
+    //       if(err) throw err
+    //       console.log("user image deleted successfull");
+    //     })
+    //   }
+    // })
 
-    const userImagePath = user.image
-    fs.access(userImagePath, )
+    // user delete
+    await User.findByIdAndDelete({
+      _id: id,
+      isAdmin: false
+    })
 
     // response from responseController
     return successResponse(res, {
       ststus: 200,
       message: "User deleted Successfull",
     });
+
   } catch (error) {
     next(error);
   }
 };
 
 // exports
-module.exports = { allUsers, getUser };
+module.exports = { allUsers, getUser, deleteUser };

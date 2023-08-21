@@ -1,4 +1,5 @@
 const {Schema, model} = require("mongoose")
+const defaultImagePath = require(".././secret")
 const bcrypt = require('bcryptjs')
 
 const userSchema = new Schema({
@@ -28,7 +29,8 @@ const userSchema = new Schema({
         set: (v) => bcrypt.hashSync(v, bcrypt.genSaltSync(10))
     },
     image: {
-        type: String
+        type: String,
+        default:[..."../public/images//user/default.png"]
     },
     phone: {
         type: String,
