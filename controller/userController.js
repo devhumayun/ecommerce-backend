@@ -153,16 +153,15 @@ const createUser = async (req, res, next) => {
       jwtSecretKey,
       "10m"
     );
-
     // send email
-    sendMail({
-      to: email,
-      sub: "Account Activation Eemail",
-      msg: `
-        <h2> Hello ${name}! </h2>  
-        <p> Please click here to <a href="${clientURL}/api/users/${token}"> activate your account </a> </p>
-      `,
-    });
+    // sendMail({
+    //   to: email,
+    //   sub: "Account Activation Eemail",
+    //   msg: `
+    //     <h2> Hello ${name}! </h2>  
+    //     <p> Please click here to <a href="${clientURL}/api/users/${token}"> activate your account </a> </p>
+    //   `,
+    // });
 
     return successResponse(res, {
       ststus: 200,
