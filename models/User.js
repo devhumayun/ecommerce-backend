@@ -26,7 +26,8 @@ const userSchema = new Schema({
     password: {
         type: String,
         requried: [true, "User password is requried"],
-        set: (v) => bcrypt.hashSync(v, bcrypt.genSaltSync(10))
+        set: (v) => bcrypt.hashSync(v, bcrypt.genSaltSync(10)),
+        minlenght: [8, "The lenght of Password minimun 8 characters long"],
     },
     image: {
         type: String,
