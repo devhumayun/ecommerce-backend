@@ -30,8 +30,9 @@ const userSchema = new Schema({
         minlenght: [8, "The lenght of Password minimun 8 characters long"],
     },
     image: {
-        type: String,
-        default: defaultImagePath
+        type: Buffer,
+        contentType: String,
+        requried: [true, "User image is requried"]
     },
     phone: {
         type: String,

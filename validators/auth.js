@@ -24,7 +24,14 @@ const validateUserRegistration = [
     // .withMessage("Password must be 8 characters including one uppercase letter, one special character and alphanumeric characters"),
   body("phone").trim().notEmpty().withMessage("Phone is requried"),
   body("address").trim().notEmpty().withMessage("address is requried"),
-  body("image").optional().isString(),
+  body("image")
+  .custom((valuse, {req}) => {
+    if(!req.file || !req.file.buffer){
+        throw new Error("Image file is requried")
+    }
+    return true
+  })
+  .withMessage("Image is requried")
 ];
 // sig in  validation
 

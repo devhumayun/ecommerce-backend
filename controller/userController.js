@@ -130,10 +130,16 @@ const deleteUser = async (req, res, next) => {
  * admin
  * create user
  */
-const createUser = async (req, res, next) => {
+const registerProcess = async (req, res, next) => {
   try {
     // get body data
     const { name, email, password, phone, address } = req.body;
+   
+    // check image
+    if(!req.file){
+      throw createError(400, "Image file is requried")
+    }
+    const imageBufferString = req.file.buffer.toString("base64")
 
     // Is email exists
     const emailCheck = await User.exists({ email });
@@ -149,19 +155,19 @@ const createUser = async (req, res, next) => {
 
     // create token
     const token = createJsonWebToken(
-      { name, email, password, phone, address },
+      { name, email, password, phone, address, imageBufferString },
       jwtSecretKey,
       "10m"
     );
     // send email
-    // sendMail({
-    //   to: email,
-    //   sub: "Account Activation Eemail",
-    //   msg: `
-    //     <h2> Hello ${name}! </h2>  
-    //     <p> Please click here to <a href="${clientURL}/api/users/${token}"> activate your account </a> </p>
-    //   `,
-    // });
+    sendMail({
+      to: email,
+      sub: "Account Activation Eemail",
+      msg: `
+        <h2> Hello ${name}! </h2>  
+        <p> Please click here to <a href="${clientURL}/api/users/${token}"> activate your account </a> </p>
+      `,
+    });
 
     return successResponse(res, {
       ststus: 200,
@@ -219,6 +225,6 @@ module.exports = {
   allUsers,
   getUser,
   deleteUser,
-  createUser,
+  registerProcess,
   accountActivation,
 };
