@@ -134,12 +134,22 @@ const registerProcess = async (req, res, next) => {
   try {
     // get body data
     const { name, email, password, phone, address } = req.body;
-   
+
     // check image
-    if(!req.file){
-      throw createError(400, "Image file is requried")
+    const image = req.file;
+    console.log(image);
+    if (!image) {
+      throw createError(400, "Image file is requried");
     }
-    const imageBufferString = req.file.buffer.toString("base64")
+    if (image) {
+      if (image.size > 1024 * 1024 * 2) {
+        throw createError(
+          400,
+          "File is too large, It should be less then 2 MB"
+        );
+      }
+    }
+    const imageBufferString = image.buffer.toString("base64");
 
     // Is email exists
     const emailCheck = await User.exists({ email });
@@ -220,6 +230,67 @@ const accountActivation = async (req, res, next) => {
   }
 };
 
+/**
+ * Put
+ * api/v1/users/:id
+ * admin
+ * update user
+ */
+const updateUser = async (req, res, next) => {
+  try {
+    // get user id
+    const userID = req.params.id;
+    // hide password
+    const option = { password: 0 };
+    await findItemById(User, userID, option);
+    const updatedOption = {
+      new: true,
+      runValidator: true,
+      context: "query",
+    };
+    const updateuser = {};
+    // name, email, password, phone, address, image
+    for (let key in req.body) {
+      if (["name", "password", "phone", "address"].includes(key)) {
+        updateuser[key] = req.body[key];
+      } else if (["email"].includes(key)) {
+        throw createError(400, "Can not update email");
+      }
+    }
+    // image handle
+    const image = req.file;
+    if (image) {
+      if (image.size > 1024 * 1024 * 2) {
+        throw createError(
+          400,
+          "File is too large, It should be less then 2 MB"
+        );
+      }
+      updateuser.image = image.buffer.toString("base64");
+    }
+
+    // user update
+    const updatedUser = await User.findByIdAndUpdate(
+      userID,
+      updateuser,
+      updatedOption
+    ).select("-password")
+      console.log(updateUser);
+    // if (!updatedUser) {
+    //   throw createError(404, "This ID is not exceeds to update any user");
+    // }
+
+    // response from responseController
+    return successResponse(res, {
+      ststus: 200,
+      message: "User updated successfull",
+      payload: { updatedUser },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // exports
 module.exports = {
   allUsers,
@@ -227,4 +298,5 @@ module.exports = {
   deleteUser,
   registerProcess,
   accountActivation,
+  updateUser,
 };
