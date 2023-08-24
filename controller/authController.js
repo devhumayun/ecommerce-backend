@@ -30,7 +30,7 @@ const login = async ( req, res, next ) => {
             return next(createError(403,"You are banned. Please contact with the authority"))
         }
         // token, cookie
-        const accessToken = createJsonWebToken({email}, accessTokenKey, "15m")
+        const accessToken = createJsonWebToken({_id: user._id}, accessTokenKey, "15m")
         res.cookie("access_token", accessToken, {
             maxAge: 15 * 60 * 1000, //15 minute
             httpOnly: true,
@@ -49,7 +49,7 @@ const login = async ( req, res, next ) => {
 }
 /**
  * post
- * api/v1/auth/login
+ * api/v1/auth/
  * public
  */
 const logout = async ( req, res, next ) => {
