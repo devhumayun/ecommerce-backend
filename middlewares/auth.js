@@ -1,6 +1,7 @@
 const createError = require("http-errors");
 const jwt = require("jsonwebtoken");
-const { accessTokenKey} = require('../secret')
+const { accessTokenKey} = require('../secret');
+const User = require("../models/User");
 /**
  * Check users islogged in
  */
@@ -38,6 +39,22 @@ const isLoggedOut = async ( req, res, next ) =>{
         return next(error)
     }
 }
+/**
+ * check user is admin
+ */
+const isAdmin = async ( req, res, next ) =>{
+    try {
+        // get id
+        const id = req.body.userId
+        const user = await User.findById(id)
+        if(!user.isAdmin){
+            throw createError(400, "You are not able to access this resources. Only admin can access")
+        }
+        next()
+    } catch (error) {
+        return next(error)
+    }
+}
 
 // exports
-module.exports = { isLoggedIn, isLoggedOut }
+module.exports = { isLoggedIn, isLoggedOut, isAdmin }
