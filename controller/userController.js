@@ -45,7 +45,7 @@ const allUsers = async (req, res, next) => {
       .skip((page - 1) * limit);
 
     // create a error
-    if (!users) throw createError(404, "users not found");
+     if (!users) throw createError(404, "users not found");
 
     // create a success msg
     return successResponse(res, {

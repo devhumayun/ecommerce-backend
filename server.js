@@ -7,6 +7,7 @@ const rateLimit = require('express-rate-limit')
 const createError = require('http-errors')
 const connectMongoDB = require("./config/db");
 const userRouter = require("./routes/userRouter");
+const authRouter = require("./routes/authRouter");
 const seedRouter = require("./routes/seedRoute");
 const { errorResponse } = require("./controller/responseController");
 
@@ -33,6 +34,7 @@ const PORT = process.env.SERVER_PORT || 5050
 
 // api routing
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/seed', seedRouter);
 
 // server listener
