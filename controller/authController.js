@@ -37,11 +37,12 @@ const login = async ( req, res, next ) => {
             secure: true,
             sameSite: "none"
         })
+        const hidePassword = await User.findOne({email}).select("-password")
         // create a success msg
         return successResponse(res, {
             ststus: 200,
             message: "Logged in successfull",
-            payload: {user},
+            payload: {hidePassword},
         });
     } catch (error) {
         next(error)

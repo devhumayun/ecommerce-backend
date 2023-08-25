@@ -34,6 +34,21 @@ const validateUserRegistration = [
   .withMessage("Image is requried")
 ];
 // sig in  validation
-
+const validateUserSign = [
+  body("email")
+    .trim()
+    .notEmpty()
+    .withMessage("Email is requried")
+    .isEmail()
+    .withMessage("Invalid Email"),
+  body("password")
+    .trim()
+    .notEmpty()
+    .withMessage("Password is requried")
+    .isLength({ min: 8 })
+    .withMessage("Password should be al least 8 characters long"),
+    // .matches(/^(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$"$/)
+    // .withMessage("Password must be 8 characters including one uppercase letter, one special character and alphanumeric characters"),
+];
 // exports
-module.exports = { validateUserRegistration };
+module.exports = { validateUserRegistration, validateUserSign };

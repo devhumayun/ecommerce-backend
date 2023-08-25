@@ -48,7 +48,7 @@ const isAdmin = async ( req, res, next ) =>{
         const id = req.body.userId
         const user = await User.findById(id)
         if(!user.isAdmin){
-            throw createError(400, "You are not able to access this resources. Only admin can access")
+            throw createError(403, "Forbidden. You are not able to access this resources. Only admin can access")
         }
         next()
     } catch (error) {
