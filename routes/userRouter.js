@@ -1,5 +1,5 @@
 const express = require("express")
-const { allUsers, getUser, deleteUser, accountActivation, registerProcess, updateUser } = require("../controller/userController")
+const { allUsers, getUser, deleteUser, accountActivation, registerProcess, updateUser, bannedUserById, unBannedUserById } = require("../controller/userController")
 const upload = require("../middlewares/uploadFile")
 const { validateUserRegistration } = require("../validators/auth")
 const runValidation = require("../validators/validationRun")
@@ -14,5 +14,7 @@ userRouter.post("/activate", isLoggedOut, accountActivation)
 userRouter.get("/:id", isLoggedIn, getUser)
 userRouter.delete("/:id", isLoggedIn, isAdmin, deleteUser)
 userRouter.put("/:id",upload.single("image"), isLoggedIn, isAdmin, updateUser)
+userRouter.put("/ban-user/:id", isLoggedIn, isAdmin, bannedUserById)
+userRouter.put("/unban-user/:id", isLoggedIn, isAdmin, unBannedUserById)
 
 module.exports = userRouter

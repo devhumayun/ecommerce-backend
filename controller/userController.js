@@ -290,6 +290,76 @@ const updateUser = async (req, res, next) => {
     next(error);
   }
 };
+/**
+ * Put
+ * api/v1/users/ban-user/:id
+ * admin
+ * banned user  by id
+ */
+const bannedUserById = async (req, res, next) => {
+  try {
+    // get user id
+    const userID = req.params.id;
+    // error handle for id
+    await findItemById(User, userID);
+    const updates = {isBanned: true}
+    const updatedOption = {
+      new: true,
+      runValidator: true,
+      context: "query",
+    };
+    // user update
+    const updatedUser = await User.findByIdAndUpdate(
+      userID,
+      updates,
+      updatedOption
+    ).select("-password")
+      console.log(updateUser);
+    
+
+    // response from responseController
+    return successResponse(res, {
+      ststus: 200,
+      message: "User was banned successfull",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+/**
+ * Put
+ * api/v1/users/unban-user/:id
+ * admin
+ * unbanned user by id
+ */
+const unBannedUserById = async (req, res, next) => {
+  try {
+    // get user id
+    const userID = req.params.id;
+    // error handle for id
+    await findItemById(User, userID);
+    const updates = {isBanned: false}
+    const updatedOption = {
+      new: true,
+      runValidator: true,
+      context: "query",
+    };
+    // user update
+    const updatedUser = await User.findByIdAndUpdate(
+      userID,
+      updates,
+      updatedOption
+    ).select("-password")
+
+    // response from responseController
+    return successResponse(res, {
+      ststus: 200,
+      message: "User was unBanned successfull",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 // exports
 module.exports = {
@@ -299,4 +369,6 @@ module.exports = {
   registerProcess,
   accountActivation,
   updateUser,
+  bannedUserById,
+  unBannedUserById
 };
