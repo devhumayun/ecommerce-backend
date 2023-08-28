@@ -360,6 +360,49 @@ const unBannedUserById = async (req, res, next) => {
     next(error);
   }
 };
+/**
+ * Put
+ * api/v1/users/unban-user/:id
+ * admin
+ * unbanned user by id
+ */
+const updatePassword = async (req, res, next) => {
+  try {
+    // get user id
+    const userID = req.params.id;
+    // get body data
+    const { oldPassword, newPassword } = req.body
+    const user = await findItemById(User, userID);
+    if(user.password !== oldPassword){
+      throw createError("400", "Old Password not match")
+    }
+    // error handle for id
+    const updates = {password: newPassword}
+    const updatedOption = {
+      new: true,
+      runValidator: true,
+      context: "query",
+    };
+    // user update
+    const updatedUser = await User.findByIdAndUpdate(
+      userID,
+      updates,
+      updatedOption
+    ).select("-password")
+
+    if (!updatedUser) {
+      throw createError(400, "Password was not updated successfull");
+    }
+
+    // response from responseController
+    return successResponse(res, {
+      ststus: 200,
+      message: "User password was updated successfull",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 // exports
 module.exports = {
@@ -370,5 +413,6 @@ module.exports = {
   accountActivation,
   updateUser,
   bannedUserById,
-  unBannedUserById
+  unBannedUserById,
+  updatePassword
 };
