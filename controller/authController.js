@@ -5,6 +5,7 @@ const User = require("../models/User");
 const { successResponse } = require("./responseController");
 const { createJsonWebToken } = require("../helper/jsonWebToken");
 const { accessTokenKey, refreshTokenKey } = require("../secret");
+const { setRefreshTokenCookie, setAccessTokenCookie } = require("../helper/cookie");
 
 /**
  * post
@@ -26,19 +27,9 @@ const login = async ( req, res, next ) => {
             return next(createError(403,"You are banned. Please contact with the authority"))
         }
         const accessToken = createJsonWebToken({_id: user._id}, accessTokenKey, "1m")
-        res.cookie("access_token", accessToken, {
-            maxAge: 1 * 60 * 1000, //15 minute
-            httpOnly: true,
-            // secure: true,
-            sameSite: "none"
-        })
+        setAccessTokenCookie(res, accessToken)
         const refreshToken = createJsonWebToken({_id: user._id}, refreshTokenKey, "7d")
-        res.cookie("refresh_token", refreshToken, {
-            maxAge: 7 * 24 * 60 * 60 * 1000, //15 minute
-            httpOnly: true,
-            // secure: true,
-            sameSite: "none"
-        })
+        setRefreshTokenCookie(res, refreshToken)
 
         const userWithoutPassword = user.toObject()
         delete userWithoutPassword.password
@@ -88,12 +79,7 @@ const refreshToken = async ( req, res, next ) => {
        
         // token, cookie
         const accessToken = createJsonWebToken({user}, accessTokenKey, "10m")
-        res.cookie("access_token", accessToken, {
-            maxAge: 10 * 60 * 1000, //10 minute
-            httpOnly: true,
-            // secure: true,
-            sameSite: "none"
-        })
+        setAccessTokenCookie(res,accessToken)
         return successResponse(res, {
             ststus: 200,
             message: "access token generated success",
