@@ -79,5 +79,19 @@ const validateUpdatePassword = [
 ];
 
 
+// forget password validation
+const validateForgetPawword = [
+  body("email")
+    .trim()
+    .notEmpty()
+    .withMessage("Email is requried")
+    .isEmail()
+    .withMessage("Invalid Email"),
+];
+
+
+
+
+
 // exports
-module.exports = { validateUserRegistration, validateUserSign, validateUpdatePassword };
+module.exports = { validateUserRegistration, validateUserSign, validateUpdatePassword, validateForgetPawword };

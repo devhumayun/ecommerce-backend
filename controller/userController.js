@@ -6,7 +6,7 @@ const mongoose = require("mongoose");
 const { findItemById } = require("../services/findItem");
 const { deleteImage } = require("../helper/helper");
 const { createJsonWebToken } = require("../helper/jsonWebToken");
-const { jwtSecretKey, clientURL } = require("../secret");
+const { jwtSecretKey, clientURL, forgetPasswordTokenKey } = require("../secret");
 const { sendMail } = require("../helper/sendMail");
 
 /**
@@ -45,7 +45,7 @@ const allUsers = async (req, res, next) => {
       .skip((page - 1) * limit);
 
     // create a error
-     if (!users) throw createError(404, "users not found");
+    if (!users) throw createError(404, "users not found");
 
     // create a success msg
     return successResponse(res, {
@@ -274,8 +274,8 @@ const updateUser = async (req, res, next) => {
       userID,
       updateuser,
       updatedOption
-    ).select("-password")
-      console.log(updateUser);
+    ).select("-password");
+    console.log(updateUser);
     // if (!updatedUser) {
     //   throw createError(404, "This ID is not exceeds to update any user");
     // }
@@ -302,7 +302,7 @@ const bannedUserById = async (req, res, next) => {
     const userID = req.params.id;
     // error handle for id
     await findItemById(User, userID);
-    const updates = {isBanned: true}
+    const updates = { isBanned: true };
     const updatedOption = {
       new: true,
       runValidator: true,
@@ -313,9 +313,8 @@ const bannedUserById = async (req, res, next) => {
       userID,
       updates,
       updatedOption
-    ).select("-password")
-      console.log(updateUser);
-    
+    ).select("-password");
+    console.log(updateUser);
 
     // response from responseController
     return successResponse(res, {
@@ -338,7 +337,7 @@ const unBannedUserById = async (req, res, next) => {
     const userID = req.params.id;
     // error handle for id
     await findItemById(User, userID);
-    const updates = {isBanned: false}
+    const updates = { isBanned: false };
     const updatedOption = {
       new: true,
       runValidator: true,
@@ -349,7 +348,7 @@ const unBannedUserById = async (req, res, next) => {
       userID,
       updates,
       updatedOption
-    ).select("-password")
+    ).select("-password");
 
     // response from responseController
     return successResponse(res, {
@@ -362,8 +361,8 @@ const unBannedUserById = async (req, res, next) => {
 };
 /**
  * Put
- * api/v1/users/unban-user/:id
- * admin
+ * api/v1/users/update-password/:id
+ * public
  * unbanned user by id
  */
 const updatePassword = async (req, res, next) => {
@@ -371,13 +370,13 @@ const updatePassword = async (req, res, next) => {
     // get user id
     const userID = req.params.id;
     // get body data
-    const { oldPassword, newPassword } = req.body
+    const { oldPassword, newPassword } = req.body;
     const user = await findItemById(User, userID);
-    if(user.password !== oldPassword){
-      throw createError("400", "Old Password not match")
+    if (user.password !== oldPassword) {
+      throw createError("400", "Old Password not match");
     }
     // error handle for id
-    const updates = {password: newPassword}
+    const updates = { password: newPassword };
     const updatedOption = {
       new: true,
       runValidator: true,
@@ -388,7 +387,7 @@ const updatePassword = async (req, res, next) => {
       userID,
       updates,
       updatedOption
-    ).select("-password")
+    ).select("-password");
 
     if (!updatedUser) {
       throw createError(400, "Password was not updated successfull");
@@ -398,6 +397,48 @@ const updatePassword = async (req, res, next) => {
     return successResponse(res, {
       ststus: 200,
       message: "User password was updated successfull",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Put
+ * api/v1/users/update-password/:id
+ * public
+ * unbanned user by id
+ */
+const forgetPassword = async (req, res, next) => {
+  try {
+    // get body data
+    const { email } = req.body;
+    // check user is exists
+    const userData = await User.findOne({ email });
+    if (!userData) {
+      throw createError("404", "User not found by this email");
+    }
+
+    // create token
+    const token = createJsonWebToken(
+      {email},
+      forgetPasswordTokenKey,
+      "10m"
+    );
+    // send email
+    sendMail({
+      to: email,
+      sub: "Reset your password",
+      msg: `
+        <h2> Hello ${userData.name}! </h2>  
+        <p> Please click here to <a href="${clientURL}/api/users/${token}"> reset your password </a> </p>
+        `,
+    });
+
+    return successResponse(res, {
+      ststus: 200,
+      message: `Check your ${userData.email} to complete the password reset process`,
+      payload: { token },
     });
   } catch (error) {
     next(error);
@@ -414,5 +455,6 @@ module.exports = {
   updateUser,
   bannedUserById,
   unBannedUserById,
-  updatePassword
+  updatePassword,
+  forgetPassword,
 };
