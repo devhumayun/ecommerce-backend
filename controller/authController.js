@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const { successResponse } = require("./responseController");
 const { createJsonWebToken } = require("../helper/jsonWebToken");
-const { accessTokenKey } = require("../secret");
+const { accessTokenKey, refreshTokenKey } = require("../secret");
 
 /**
  * post
@@ -30,11 +30,19 @@ const login = async ( req, res, next ) => {
             return next(createError(403,"You are banned. Please contact with the authority"))
         }
         // token, cookie
-        const accessToken = createJsonWebToken({_id: user._id}, accessTokenKey, "15m")
+        const accessToken = createJsonWebToken({_id: user._id}, accessTokenKey, "1m")
         res.cookie("access_token", accessToken, {
-            maxAge: 15 * 60 * 1000, //15 minute
+            maxAge: 1 * 60 * 1000, //15 minute
             httpOnly: true,
-            secure: true,
+            // secure: true,
+            sameSite: "none"
+        })
+        // freshtoken, cookie
+        const refreshToken = createJsonWebToken({_id: user._id}, refreshTokenKey, "7d")
+        res.cookie("refresh_token", refreshToken, {
+            maxAge: 7 * 24 * 60 * 60 * 1000, //15 minute
+            httpOnly: true,
+            // secure: true,
             sameSite: "none"
         })
         const hidePassword = await User.findOne({email}).select("-password")
@@ -66,7 +74,61 @@ const logout = async ( req, res, next ) => {
         next(error)
     }
 }
+/*
+ * get
+ * api/v1/auth/refresh-token
+ * public
+ */
+const refreshToken = async ( req, res, next ) => {
+    try {
+        
+        const refresh_token = req.cookies.refresh_token
+        if(!refresh_token){
+            throw createError(404, "Refresh token missing")
+        }
+        const decodedToken = jwt.verify(refresh_token, refreshTokenKey )
+        if(!decodedToken){
+            throw createError(404, "Invalid Token")
+        }
+        const user = await User.findById(decodedToken._id).select("password")
+       
+        // token, cookie
+        const accessToken = createJsonWebToken({user}, accessTokenKey, "1m")
+        res.cookie("access_token", accessToken, {
+            maxAge: 1 * 60 * 1000, //15 minute
+            httpOnly: true,
+            // secure: true,
+            sameSite: "none"
+        })
+        return successResponse(res, {
+            ststus: 200,
+            message: "access token generated success",
+        });
+    } catch (error) {
+        next(error)
+    }
+}
+const protectedRoute = async ( req, res, next ) => {
+    try {
+        
+        const access_token = req.cookies.access_token
+        if(!access_token){
+            throw createError(404, "Access token missing, Please log in again")
+        }
+        const decodedToken = jwt.verify(access_token, accessTokenKey)
+        if(!decodedToken){
+            throw createError(404, "Invalid Token")
+        }
+
+        return successResponse(res, {
+            ststus: 200,
+            message: "Protected route resource access successfull",
+        });
+    } catch (error) {
+        next(error)
+    }
+}
 
 
 // export
-module.exports = { login, logout }
+module.exports = { login, logout, refreshToken, protectedRoute }

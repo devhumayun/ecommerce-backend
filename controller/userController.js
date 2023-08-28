@@ -461,7 +461,7 @@ const resetPassword = async (req, res, next) => {
     const option = {new:true}
     const filter = {email: decoded.email}
     const updates = {password: password}
-    const updatePass = await User.findOneAndUpdate(filter, updates, option)
+    const updatePass = await User.findOneAndUpdate(filter, updates, option).select("password")
     if(!updatePass){
       throw createError(400, "Password reset action failed, Please try again")
     }
