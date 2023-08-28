@@ -11,16 +11,16 @@ userRouter.get("/", isLoggedIn, isAdmin, allUsers)
 userRouter.post("/process-register", upload.single("image"), isLoggedOut, validateUserRegistration, runValidation, registerProcess )
 // userRouter.route('/activate').post(accountActivation)
 userRouter.post("/activate", isLoggedOut, accountActivation)
-userRouter.get("/:id", isLoggedIn, getUser)
-userRouter.delete("/:id", isLoggedIn, isAdmin, deleteUser)
+userRouter.get("/:id([0-8a-fA-F]{24})", isLoggedIn, getUser)
+userRouter.delete("/:id([0-8a-fA-F]{24})", isLoggedIn, isAdmin, deleteUser)
 
 userRouter.put("/reset-password", validateResetPassword, runValidation, resetPassword)
 
-userRouter.put("/:id",upload.single("image"), isLoggedIn, isAdmin, updateUser)
-userRouter.put("/ban-user/:id", isLoggedIn, isAdmin, bannedUserById)
-userRouter.put("/unban-user/:id", isLoggedIn, isAdmin, unBannedUserById)
-userRouter.put("/update-password/:id", isLoggedIn, validateUpdatePassword, runValidation, updatePassword)
-userRouter.post("/forget-password/:id", validateForgetPassword, runValidation, forgetPassword)
+userRouter.put("/:id([0-8a-fA-F]{24})",upload.single("image"), isLoggedIn, isAdmin, updateUser)
+userRouter.put("/ban-user/:id([0-8a-fA-F]{24})", isLoggedIn, isAdmin, bannedUserById)
+userRouter.put("/unban-user/:id([0-8a-fA-F]{24})", isLoggedIn, isAdmin, unBannedUserById)
+userRouter.put("/update-password/:id([0-8a-fA-F]{24})", isLoggedIn, validateUpdatePassword, runValidation, updatePassword)
+userRouter.post("/forget-password/:id([0-8a-fA-F]{24})", validateForgetPassword, runValidation, forgetPassword)
 
 
 module.exports = userRouter

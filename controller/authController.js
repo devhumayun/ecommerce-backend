@@ -13,23 +13,18 @@ const { accessTokenKey, refreshTokenKey } = require("../secret");
  */
 const login = async ( req, res, next ) => {
     try {
-        // login data
         const { email, password } = req.body
-        // isExists email
         const user = await User.findOne({email})
         if(!user){
             return next(createError(404,"User doesn't exists with this email"))
         }
-        // compare password
         const isPasswordMatch = await bcrypt.compare(password, user.password)
         if(!isPasswordMatch){
             return next(createError(401,"Wrong Password"))
         }
-        // isBanned
         if(user.isBanned){
             return next(createError(403,"You are banned. Please contact with the authority"))
         }
-        // token, cookie
         const accessToken = createJsonWebToken({_id: user._id}, accessTokenKey, "1m")
         res.cookie("access_token", accessToken, {
             maxAge: 1 * 60 * 1000, //15 minute
@@ -37,7 +32,6 @@ const login = async ( req, res, next ) => {
             // secure: true,
             sameSite: "none"
         })
-        // freshtoken, cookie
         const refreshToken = createJsonWebToken({_id: user._id}, refreshTokenKey, "7d")
         res.cookie("refresh_token", refreshToken, {
             maxAge: 7 * 24 * 60 * 60 * 1000, //15 minute
@@ -45,12 +39,12 @@ const login = async ( req, res, next ) => {
             // secure: true,
             sameSite: "none"
         })
-        const hidePassword = await User.findOne({email}).select("-password")
-        // create a success msg
+
+        const userWithoutPassword = user.toObject()
+        delete userWithoutPassword.password
         return successResponse(res, {
             ststus: 200,
-            message: "Logged in successfull",
-            payload: {hidePassword},
+            message: "Logged in successfull"
         });
     } catch (error) {
         next(error)
@@ -58,13 +52,13 @@ const login = async ( req, res, next ) => {
 }
 /**
  * post
- * api/v1/auth/
+ * api/v1/auth/logout
  * public
  */
 const logout = async ( req, res, next ) => {
     try {
         res.clearCookie("access_token")
-        // create a success msg
+        res.clearCookie("refresh_token")
         return successResponse(res, {
             ststus: 200,
             message: "Logged out successfull",
@@ -93,9 +87,9 @@ const refreshToken = async ( req, res, next ) => {
         const user = await User.findById(decodedToken._id).select("password")
        
         // token, cookie
-        const accessToken = createJsonWebToken({user}, accessTokenKey, "1m")
+        const accessToken = createJsonWebToken({user}, accessTokenKey, "10m")
         res.cookie("access_token", accessToken, {
-            maxAge: 1 * 60 * 1000, //15 minute
+            maxAge: 10 * 60 * 1000, //10 minute
             httpOnly: true,
             // secure: true,
             sameSite: "none"
