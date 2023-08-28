@@ -445,6 +445,37 @@ const forgetPassword = async (req, res, next) => {
   }
 };
 
+/**
+ * Put
+ * api/v1/users/:id
+ * admin
+ * update user
+ */
+const resetPassword = async (req, res, next) => {
+  try {
+    const {token, password} = req.body
+    const decoded = jwt.verify(token, forgetPasswordTokenKey)
+    if(!decoded){
+      throw createError(400, "Invalid Token")
+    }
+    const option = {new:true}
+    const filter = {email: decoded.email}
+    const updates = {password: password}
+    const updatePass = await User.findOneAndUpdate(filter, updates, option)
+    if(!updatePass){
+      throw createError(400, "Password reset action failed, Please try again")
+    }
+    // response from responseController
+    return successResponse(res, {
+      ststus: 200,
+      message: "User password reset successfull",
+      payload:{},
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // exports
 module.exports = {
   allUsers,
@@ -457,4 +488,5 @@ module.exports = {
   unBannedUserById,
   updatePassword,
   forgetPassword,
+  resetPassword
 };

@@ -80,7 +80,7 @@ const validateUpdatePassword = [
 
 
 // forget password validation
-const validateForgetPawword = [
+const validateForgetPassword = [
   body("email")
     .trim()
     .notEmpty()
@@ -89,9 +89,25 @@ const validateForgetPawword = [
     .withMessage("Invalid Email"),
 ];
 
+// reset password validation
+const validateResetPassword = [
+  body("token")
+    .trim()
+    .notEmpty()
+    .withMessage("Token is requried"),
+  body("password")
+    .trim()
+    .notEmpty()
+    .withMessage("Password is requried")
+    .isLength({ min: 8 })
+    .withMessage("Password should be al least 8 characters long"),
+    // .matches(/^(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$"$/)
+    // .withMessage("Password must be 8 characters including one uppercase letter, one special character and alphanumeric characters"),
+];
+
 
 
 
 
 // exports
-module.exports = { validateUserRegistration, validateUserSign, validateUpdatePassword, validateForgetPawword };
+module.exports = { validateUserRegistration, validateUserSign, validateUpdatePassword, validateForgetPassword, validateResetPassword };
