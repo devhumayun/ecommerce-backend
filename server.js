@@ -36,7 +36,7 @@ const PORT = process.env.SERVER_PORT || 5050
 // api routing
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/auth', authRouter);
-app.use('/api/v1/category', categoryRouter);
+app.use('/api/v1/categories', categoryRouter);
 app.use('/api/v1/seed', seedRouter);
 
 // server listener

@@ -13,4 +13,8 @@ const allCategories = async () => {
    return await Category.find().select("name slug").lean()
 }
 
-module.exports = {categoryService, allCategories}
+const SingleCategory = async (slug) => {
+   return await Category.find({slug}).select("name slug").lean()
+}
+
+module.exports = {categoryService, allCategories, SingleCategory }
