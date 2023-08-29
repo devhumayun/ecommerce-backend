@@ -1,7 +1,7 @@
 const createError = require("http-errors");
 const { successResponse } = require("./responseController");
 const mongoose = require("mongoose");
-const { categoryService, allCategories, SingleCategory, categoryUpdate } = require("../services/categoryServices");
+const { categoryService, allCategories, SingleCategory, categoryUpdate, categoryDelete } = require("../services/categoryServices");
 /**
  * POST
  * api/v1/category
@@ -13,7 +13,7 @@ const createCategory = async (req, res, next) => {
     const { name } = req.body
     await categoryService(name)
     return successResponse(res, {
-      ststus: 200,
+      ststus: 201,
       message: `Category was created successfull`,
     });
   } catch (error) {
@@ -89,11 +89,32 @@ const updateCategory = async (req, res, next) => {
   }
 };
 
+/**
+ * delete
+ * api/v1/categories/:slug
+ */
+const deleteCategory = async (req, res, next) => {
+    try {
+      const {slug} = req.params
+      const result = await categoryDelete(slug)
+      if(!result){
+          throw createError(404, "No category found with this slug")
+      }
+      return successResponse(res, {
+        ststus: 200,
+        message: `Category deleted successfull`,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+  
 
 // exports
 module.exports = {
 createCategory,
 getCategories,
 getCategory,
-updateCategory
+updateCategory,
+deleteCategory
 };
