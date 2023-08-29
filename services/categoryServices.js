@@ -1,11 +1,16 @@
 const slugify = require('slugify')
-const category = require("../models/Category")
+const Category = require("../models/Category")
+
 const categoryService = async (name) => {
-    const newCreateCategory = await category.create({
+    const newCreateCategory = await Category.create({
         name: name,
         slug: slugify(name)
     })
     return newCreateCategory
 }
 
-module.exports = {categoryService}
+const allCategories = async () => {
+   return await Category.find().select("name slug").lean()
+}
+
+module.exports = {categoryService, allCategories}
