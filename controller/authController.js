@@ -26,7 +26,7 @@ const login = async ( req, res, next ) => {
         if(user.isBanned){
             return next(createError(403,"You are banned. Please contact with the authority"))
         }
-        const accessToken = createJsonWebToken({_id: user._id}, accessTokenKey, "1m")
+        const accessToken = createJsonWebToken({_id: user._id}, accessTokenKey, "30m")
         setAccessTokenCookie(res, accessToken)
         const refreshToken = createJsonWebToken({_id: user._id}, refreshTokenKey, "7d")
         setRefreshTokenCookie(res, refreshToken)
@@ -78,7 +78,7 @@ const refreshToken = async ( req, res, next ) => {
         const user = await User.findById(decodedToken._id).select("password")
        
         // token, cookie
-        const accessToken = createJsonWebToken({user}, accessTokenKey, "10m")
+        const accessToken = createJsonWebToken({user}, accessTokenKey, "30m")
         setAccessTokenCookie(res,accessToken)
         return successResponse(res, {
             ststus: 200,
