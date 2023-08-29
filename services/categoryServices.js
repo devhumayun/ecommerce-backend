@@ -17,4 +17,12 @@ const SingleCategory = async (slug) => {
    return await Category.find({slug}).select("name slug").lean()
 }
 
-module.exports = {categoryService, allCategories, SingleCategory }
+const categoryUpdate = async (slug, name) => {
+   const filter = {slug}
+   const updates = {$set: {name: name, slug: slugify(name)}}
+   const option = { new: true }
+   const catUpdate = await Category.findOneAndUpdate(filter, updates, option)
+   return catUpdate
+}
+
+module.exports = {categoryService, allCategories, SingleCategory,categoryUpdate  }

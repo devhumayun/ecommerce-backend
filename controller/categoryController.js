@@ -1,7 +1,7 @@
 const createError = require("http-errors");
 const { successResponse } = require("./responseController");
 const mongoose = require("mongoose");
-const { categoryService, allCategories, SingleCategory } = require("../services/categoryServices");
+const { categoryService, allCategories, SingleCategory, categoryUpdate } = require("../services/categoryServices");
 /**
  * POST
  * api/v1/category
@@ -30,6 +30,9 @@ const createCategory = async (req, res, next) => {
 const getCategories = async (req, res, next) => {
   try {
     const categories = await allCategories()
+    if(!categories){
+        throw createError(404, "No category found with this slug")
+    }
     return successResponse(res, {
       ststus: 200,
       message: `Categories fatched successfull`,
@@ -42,18 +45,44 @@ const getCategories = async (req, res, next) => {
 
 /**
  * Get
- * api/v1/categories/:id
- * admin
- * create category
+ * api/v1/categories/:slug
  */
 const getCategory = async (req, res, next) => {
   try {
     const {slug} = req.params
     const category = await SingleCategory(slug)
+    if(!category){
+        throw createError(404, "No category found with this slug")
+    }
     return successResponse(res, {
       ststus: 200,
       message: `Category fatched successfull`,
       payload: category
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * put
+ * api/v1/categories/:slug
+ */
+const updateCategory = async (req, res, next) => {
+  try {
+    const {slug} = req.params
+    const {name} = req.body
+
+
+    const updatedCat = await categoryUpdate(slug, name)
+    if(!updatedCat){
+        throw createError(404, "No category found with this slug")
+    }
+
+    return successResponse(res, {
+      ststus: 200,
+      message: `Category fatched successfull`,
+      payload: updatedCat
     });
   } catch (error) {
     next(error);
@@ -65,5 +94,6 @@ const getCategory = async (req, res, next) => {
 module.exports = {
 createCategory,
 getCategories,
-getCategory
+getCategory,
+updateCategory
 };
