@@ -153,8 +153,9 @@ const registerProcess = async (req, res, next) => {
 
     // Is email exists
     const emailCheck = await User.exists({ email });
-    if (emailCheck)
+    if (emailCheck){
       throw createError(404, "Email already exists, Please sign in");
+    }
     // Is mobile exists
     const phoneCheck = await User.exists({ phone });
     if (phoneCheck)

@@ -2,6 +2,7 @@ const express = require("express")
 const morgan = require("morgan");
 const dotenv = require("dotenv").config()
 const color = require("colors")
+const cors = require("cors")
 const cookieParser = require("cookie-parser")
 const rateLimit = require('express-rate-limit')
 const createError = require('http-errors')
@@ -11,6 +12,7 @@ const authRouter = require("./routes/authRouter");
 const seedRouter = require("./routes/seedRoute");
 const { errorResponse } = require("./controller/responseController");
 const categoryRouter = require("./routes/categoryRoute");
+const productRouter = require("./routes/productRouter");
 
 // application init
 const app = express()
@@ -28,6 +30,7 @@ app.use(rateLimiter)
 app.use(express.json());
 app.use(express.urlencoded({ extended : false }));
 app.use(cookieParser());
+app.use(cors())
 
 
 // environment variable init
@@ -37,6 +40,7 @@ const PORT = process.env.SERVER_PORT || 5050
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/categories', categoryRouter);
+app.use('/api/v1/products', productRouter);
 app.use('/api/v1/seed', seedRouter);
 
 // server listener

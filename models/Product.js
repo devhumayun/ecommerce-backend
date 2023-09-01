@@ -18,7 +18,7 @@ const productSchema = new Schema({
     },
     description: {
         type: String,
-        requried: [true, "Category name is requried"],
+        requried: [true, "Product description is requried"],
         trim: true,
     },
     price:{
@@ -35,7 +35,7 @@ const productSchema = new Schema({
         trim: true,
         default: 0,
         validate : {
-            validator : (v) => v > 0,
+            validator : (v) => v >= 0,
             message: (props) => `${props.value} is not a valid price`
         }
     },
@@ -53,7 +53,7 @@ const productSchema = new Schema({
         trim: true,
         default: 0,
         validate : {
-            validator : (v) => v > 0,
+            validator : (v) => v >= 0,
             message: (props) => `${props.value} is not a valid number`
         }
     },
